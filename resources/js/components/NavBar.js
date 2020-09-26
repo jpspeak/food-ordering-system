@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function NavBar({ useBackButton }) {
+export default function NavBar({ useBackButton, withBasket }) {
     const classes = useStyles();
     const [drawerOpen, setDrawerOpen] = React.useState(false);
 
@@ -67,7 +67,7 @@ export default function NavBar({ useBackButton }) {
     return (
         <div className={classes.root}>
             <AppBar position="static">
-                <Container maxWidth="md" className={classes.clearPaddingOnSm}>
+                <Container maxWidth="lg" className={classes.clearPaddingOnSm}>
                     <Toolbar>
                         {useBackButton ? (
                             <Box className={classes.backButton}>
@@ -105,16 +105,17 @@ export default function NavBar({ useBackButton }) {
                                 </Typography>
                             </>
                         )}
-
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                        >
-                            <Badge badgeContent={8} color="secondary">
-                                <ShoppingBasketIcon />
-                            </Badge>
-                        </IconButton>
+                        {withBasket && (
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                            >
+                                <Badge badgeContent={8} color="secondary">
+                                    <ShoppingBasketIcon />
+                                </Badge>
+                            </IconButton>
+                        )}
                     </Toolbar>
                 </Container>
             </AppBar>

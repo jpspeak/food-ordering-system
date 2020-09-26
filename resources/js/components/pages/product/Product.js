@@ -1,6 +1,7 @@
 import React from "react";
 import NavBar from "../../NavBar";
 import QuantiyCounter from "./QuantityCounter";
+import AddMoreCheckoutModal from "./AddMoreCheckoutModal";
 
 import { Grid, Box, Container, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -39,8 +40,8 @@ const Product = () => {
     const classes = useStyles();
     return (
         <>
-            <NavBar useBackButton />
-            <Container maxWidth="md" className={classes.clearPaddingOnSm}>
+            <NavBar useBackButton withBasket />
+            <Container maxWidth="lg" className={classes.clearPaddingOnSm}>
                 <Grid container>
                     <Grid item xs={12} sm={6}>
                         <Box className={classes.imgContainer}>
@@ -65,6 +66,7 @@ const Product = () => {
                         </Box>
                         <Box className="p-2 mt-5">
                             <Button
+                                size="large"
                                 variant="contained"
                                 className="w-100"
                                 color="secondary"
@@ -75,6 +77,7 @@ const Product = () => {
                     </Grid>
                 </Grid>
             </Container>
+            <AddMoreCheckoutModal />
         </>
     );
 };

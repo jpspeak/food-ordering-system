@@ -39,8 +39,8 @@ const Menu = () => {
     const classes = useStyles();
     return (
         <>
-            <NavBar />
-            <Container maxWidth="md" className={classes.clearPaddingOnSm}>
+            <NavBar withBasket />
+            <Container maxWidth="lg" className={classes.clearPaddingOnSm}>
                 <SearchBar />
                 <CategoryNav />
                 <Grid container className="p-2">

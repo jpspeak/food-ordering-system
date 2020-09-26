@@ -30,7 +30,27 @@ const useStyles = makeStyles(theme => ({
         left: 0,
         width: "100%",
         height: "100%",
-        padding: theme.spacing(1)
+        padding: theme.spacing(0.5)
+    },
+    categoryName: {
+        color: "#fff",
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        textAlign: "center",
+        fontWeight: "bold"
+    },
+    categoryNameResponsive: {
+        [theme.breakpoints.only("xs")]: {
+            fontSize: 18
+        },
+        [theme.breakpoints.only("sm")]: {
+            fontSize: 24
+        },
+        [theme.breakpoints.up("md")]: {
+            fontSize: 32
+        }
     }
 }));
 
@@ -38,59 +58,56 @@ const Home = () => {
     const classes = useStyles();
     return (
         <>
-            <NavBar />
-            <Container maxWidth="md" className={classes.clearPaddingOnSm}>
+            <NavBar withBasket />
+            <Container maxWidth="lg" className={classes.clearPaddingOnSm}>
                 <Carousel />
-                <Grid container className="p-2">
-                    <Grid item xs={6} md={4}>
+                <Grid
+                    container
+                    className="p-1"
+                    // style={{ backgroundColor: "rgba(0, 0, 0, 1)" }}
+                >
+                    <Grid item xs={6}>
                         <Box className={classes.imgContainer}>
                             <Box className={classes.imgSubContainer}>
                                 <img
                                     src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
+                                    className={`${classes.img} hover-design`}
                                 />
                             </Box>
                             <Typography
-                                style={{
-                                    color: "#fff",
-                                    position: "absolute",
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                    fontSize: "4vw"
-                                }}
+                                className={`${classes.categoryName} ${classes.categoryNameResponsive}`}
                             >
                                 All products
                             </Typography>
                         </Box>
                     </Grid>
 
-                    <Grid item xs={6} md={4}>
+                    <Grid item xs={6}>
                         <Box className={classes.imgContainer}>
                             <Box className={classes.imgSubContainer}>
                                 <img
                                     src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
+                                    className={`${classes.img} hover-design`}
                                 />
                             </Box>
                         </Box>
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid item xs={6}>
                         <Box className={classes.imgContainer}>
                             <Box className={classes.imgSubContainer}>
                                 <img
                                     src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
+                                    className={`${classes.img} hover-design`}
                                 />
                             </Box>
                         </Box>
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid item xs={6}>
                         <Box className={classes.imgContainer}>
                             <Box className={classes.imgSubContainer}>
                                 <img
                                     src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
+                                    className={`${classes.img} hover-design`}
                                 />
                             </Box>
                         </Box>

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Home from "./pages/home/Home";
 import Menu from "./pages/menu/Menu";
 import Product from "./pages/product/Product";
+import OrderSummary from "./pages/order_summary/OrderSummary";
 import "./App.css";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { red, amber } from "@material-ui/core/colors";
@@ -32,6 +33,9 @@ const App = () => {
                     </Route>
                     <Route exact strict path="/product">
                         <Product />
+                    </Route>
+                    <Route exact strict path="/order-summary">
+                        <OrderSummary />
                     </Route>
                 </Router>
             </ThemeProvider>

@@ -1,15 +1,24 @@
 import React from "react";
 
+import { Button } from "@material-ui/core";
 const style = {
     img: {
-        objectFit: "cover"
+        objectFit: "cover",
+        height: "100%",
+        height: "100%",
+        filter: "brightness(80%)"
     },
     carouselInner: {
         position: "absolute",
         top: 0,
-        left: 0
+        left: 0,
+        width: "100%",
+        height: "100%"
     },
-    carouselInnerContainer: { position: "relative", paddingBottom: "66.67%" }
+    carouselInnerContainer: {
+        position: "relative",
+        paddingBottom: "66.67%"
+    }
 };
 const Carousel = () => {
     return (
@@ -34,31 +43,52 @@ const Carousel = () => {
                         data-slide-to="2"
                     ></li>
                 </ol>
-                <div style={style.carouselInnerContainer}>
-                    <div className="carousel-inner" style={style.carouselInner}>
+                <div>
+                    <div className="carousel-inner">
                         <div className="carousel-item active">
-                            <img
-                                className="d-block w-100"
-                                style={style.img}
-                                src="/storage/home/carousel_images/carousel_burgers.jpg"
-                                alt="First slide"
-                            />
+                            <div style={style.carouselInnerContainer}>
+                                <div style={style.carouselInner}>
+                                    <img
+                                        className="d-block w-100"
+                                        style={style.img}
+                                        src="/storage/home/carousel_images/carousel_burgers.jpg"
+                                        alt="First slide"
+                                    />
+                                    <div className="carousel-caption d-none d-md-block">
+                                        <h1>CAPTION </h1>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="carousel-item">
-                            <img
-                                className="d-block w-100"
-                                style={style.img}
-                                src="/storage/home/carousel_images/carousel_beverages.jpg"
-                                alt="Second slide"
-                            />
+                            <div style={style.carouselInnerContainer}>
+                                <div style={style.carouselInner}>
+                                    <img
+                                        className="d-block w-100"
+                                        style={style.img}
+                                        src="/storage/home/carousel_images/carousel_beverages.jpg"
+                                        alt="First slide"
+                                    />
+                                    <div className="carousel-caption d-none d-md-block">
+                                        <h1>CAPTION </h1>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="carousel-item">
-                            <img
-                                className="d-block w-100"
-                                style={style.img}
-                                src="/storage/home/carousel_images/carousel_combo.jpg"
-                                alt="Third slide"
-                            />
+                            <div style={style.carouselInnerContainer}>
+                                <div style={style.carouselInner}>
+                                    <img
+                                        className="d-block w-100"
+                                        style={style.img}
+                                        src="/storage/home/carousel_images/carousel_combo.jpg"
+                                        alt="First slide"
+                                    />
+                                    <div className="carousel-caption d-none d-md-block">
+                                        <h1>CAPTION </h1>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
