@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
+
+import { UserContext } from "./contexts/user/UserContext";
 
 import {
     AppBar,
@@ -14,12 +16,16 @@ import {
     ListItemText,
     Badge
 } from "@material-ui/core";
-
 import { makeStyles } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
-import MailIcon from "@material-ui/icons/Mail";
+import LockIcon from "@material-ui/icons/Lock";
+import AssignmentIcon from "@material-ui/icons/Assignment";
 import ShoppingBasketIcon from "@material-ui/icons/ShoppingBasket";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import PersonIcon from "@material-ui/icons/Person";
+import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
+
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -46,21 +52,74 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function NavBar({ useBackButton, withBasket }) {
-    const classes = useStyles();
+    const userContext = useContext(UserContext);
+    const history = useHistory();
     const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const classes = useStyles();
 
     const toggleDrawer = open => {
         setDrawerOpen(open);
     };
+
+    const logout = () => {
+        axios({
+            method: "POST",
+            url: "/api/auth/logout",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`
+            }
+        })
+            .then(() => {
+                localStorage.removeItem("userToken");
+                userContext.dispatch({ type: "DELETE_USER" });
+            })
+            .catch(err => {});
+    };
+
     const list = () => (
         <div>
             <List className={classes.drawerWidth}>
-                <ListItem button>
-                    <ListItemIcon>
-                        <MailIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="test" />
-                </ListItem>
+                {userContext.data.user === undefined ? (
+                    <ListItem
+                        button
+                        onClick={() => {
+                            history.push("/login");
+                        }}
+                    >
+                        <ListItemIcon>
+                            <LockIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Login" />
+                    </ListItem>
+                ) : (
+                    <>
+                        <ListItem button onClick={() => {}}>
+                            <ListItemIcon>
+                                <PersonIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={userContext.data.user.name}
+                            />
+                        </ListItem>
+                        <ListItem
+                            button
+                            onClick={() => {
+                                history.push("/order-history");
+                            }}
+                        >
+                            <ListItemIcon>
+                                <AssignmentIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Order history" />
+                        </ListItem>
+                        <ListItem button onClick={logout}>
+                            <ListItemIcon>
+                                <PowerSettingsNewIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Log out" />
+                        </ListItem>
+                    </>
+                )}
             </List>
         </div>
     );
@@ -75,7 +134,7 @@ export default function NavBar({ useBackButton, withBasket }) {
                                     edge="start"
                                     color="inherit"
                                     aria-label="menu"
-                                    // onClick={() => toggleDrawer(true)}
+                                    onClick={() => history.goBack()}
                                 >
                                     <ArrowBackIcon />
                                 </IconButton>
