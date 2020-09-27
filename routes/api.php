@@ -15,14 +15,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-
     'middleware' => 'api',
     'prefix' => 'auth'
-
 ], function ($router) {
     Route::post('register', 'API\Auth\AuthController@register');
     Route::post('login', 'API\Auth\AuthController@login');
     Route::post('logout', 'API\Auth\AuthController@logout');
     Route::post('refresh', 'API\Auth\AuthController@refresh');
     Route::get('user', 'API\Auth\AuthController@getAuthUser');
+});
+Route::group(['middleware' => 'api'], function () {
+    Route::get('categories', 'API\CategoryController@all');
+    Route::get('products/{id}', 'API\ProductController@show');
+    Route::get('menu', 'API\ProductController@all');
+
+    Route::get('order-summary', 'API\OrderSummaryController@all');
+
+    Route::post('bag', 'API\BagController@store');
+    Route::post('bag/{id}/increment', 'API\BagController@increment');
+    Route::post('bag/{id}/decrement', 'API\BagController@decrement');
+    Route::get('bag/count', 'API\BagController@count');
+
+    Route::post('coupons/check', 'API\CouponController@check');
+
+    Route::post('place-order', 'API\PlaceOrderController@store');
+
+    Route::get('order-history', 'API\OrderHistoryController@all');
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import NavBar from "../../NavBar";
 import Carousel from "./Carousel";
@@ -6,6 +6,7 @@ import Carousel from "./Carousel";
 import { Container, Grid, Box, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
+import { useHistory } from "react-router-dom";
 const useStyles = makeStyles(theme => ({
     clearPaddingOnSm: {
         [theme.breakpoints.down("sm")]: {
@@ -55,63 +56,51 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Home = () => {
+    const history = useHistory();
+    const [categories, setCategories] = useState([]);
     const classes = useStyles();
+    const loadCategories = () => {
+        axios({
+            method: "GET",
+            url: "/api/categories"
+        }).then(({ data }) => {
+            setCategories(data);
+        });
+    };
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
     return (
         <>
             <NavBar withBasket />
             <Container maxWidth="lg" className={classes.clearPaddingOnSm}>
                 <Carousel />
-                <Grid
-                    container
-                    className="p-1"
-                    // style={{ backgroundColor: "rgba(0, 0, 0, 1)" }}
-                >
-                    <Grid item xs={6}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={`${classes.img} hover-design`}
-                                />
+                <Grid container className="p-1">
+                    {categories.map(category => (
+                        <Grid
+                            item
+                            xs={6}
+                            key={category.id}
+                            onClick={() => {
+                                history.push(`/menu?category=${category.id}`);
+                            }}
+                        >
+                            <Box className={classes.imgContainer}>
+                                <Box className={classes.imgSubContainer}>
+                                    <img
+                                        src={category.image}
+                                        className={`${classes.img} hover-design`}
+                                    />
+                                </Box>
+                                <Typography
+                                    className={`${classes.categoryName} ${classes.categoryNameResponsive}`}
+                                >
+                                    {category.name}
+                                </Typography>
                             </Box>
-                            <Typography
-                                className={`${classes.categoryName} ${classes.categoryNameResponsive}`}
-                            >
-                                All products
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={`${classes.img} hover-design`}
-                                />
-                            </Box>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={`${classes.img} hover-design`}
-                                />
-                            </Box>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={`${classes.img} hover-design`}
-                                />
-                            </Box>
-                        </Box>
-                    </Grid>
+                        </Grid>
+                    ))}
                 </Grid>
             </Container>
         </>

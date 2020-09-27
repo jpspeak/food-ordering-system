@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
+
+import { ProductContext } from "../../contexts/products/ProductContext";
+import { QuantityContext } from "../../contexts/products/QuantityContext";
+import { OrderCountContext } from "../../contexts/order_summary/OrderCountContext";
+
 import NavBar from "../../NavBar";
 import QuantiyCounter from "./QuantityCounter";
 import AddMoreCheckoutModal from "./AddMoreCheckoutModal";
 
 import { Grid, Box, Container, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+
+import { useParams, useHistory, useLocation } from "react-router-dom";
+import { OrderSummaryContext } from "../../contexts/order_summary/OrderSummaryContext";
 
 const useStyles = makeStyles(theme => ({
     clearPaddingOnSm: {
@@ -15,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     img: {
         width: "100%",
         height: "100%",
-        objectFit: "cover",
+        objectFit: "contain",
         filter: "brightness(75%)"
     },
     imgContainer: {
@@ -37,7 +45,59 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 const Product = () => {
+    const { productId } = useParams();
+    const location = useLocation();
+    const history = useHistory();
+    const productContext = useContext(ProductContext);
+    const orderCountContext = useContext(OrderCountContext);
+    const quantityContext = useContext(QuantityContext);
+    const [openModal, setOpenModal] = useState(false);
     const classes = useStyles();
+    const addToBag = () => {
+        axios({
+            method: "POST",
+            url: "/api/bag",
+            data: {
+                product_id: productId,
+                quantity: quantityContext.data.quantity
+            },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`
+            }
+        })
+            .then(({ data }) => {
+                setOpenModal(true);
+                console.log(data);
+                orderCountContext.dispatch({
+                    type: "LOAD_ORDER_COUNT",
+                    payload: data
+                });
+            })
+            .catch(err => {
+                if (err.response.status == 401) {
+                    history.push("/login");
+                    history.push({
+                        pathname: "/login",
+                        state: { returnPath: location.pathname }
+                    });
+                }
+            });
+    };
+    const loadProduct = () => {
+        axios({
+            method: "GET",
+            url: `/api/products/${productId}`
+        }).then(({ data }) => {
+            productContext.dispatch({
+                type: "UPDATE_PRODUCT",
+                payload: data
+            });
+        });
+    };
+    useEffect(() => {
+        loadProduct();
+    }, []);
+
     return (
         <>
             <NavBar useBackButton withBasket />
@@ -47,7 +107,10 @@ const Product = () => {
                         <Box className={classes.imgContainer}>
                             <Box className={classes.imgSubContainer}>
                                 <img
-                                    src="/storage/home/category_images/all-products.jpg"
+                                    src={
+                                        productContext.data.product &&
+                                        productContext.data.product.image
+                                    }
                                     className={classes.img}
                                 />
                             </Box>
@@ -56,9 +119,15 @@ const Product = () => {
                     <Grid item xs={12} sm={6}>
                         <Box display="flex" className="p-2">
                             <Box className={classes.productDetails}>
-                                <Typography>Hotdog</Typography>
+                                <Typography>
+                                    {productContext.data.product &&
+                                        productContext.data.product.name}
+                                </Typography>
                                 <Typography className="font-weight-bold">
-                                    ₱ 12
+                                    ₱{" "}
+                                    {productContext.data.product &&
+                                        productContext.data.product.price *
+                                            quantityContext.data.quantity}
                                 </Typography>
                             </Box>
 
@@ -70,6 +139,7 @@ const Product = () => {
                                 variant="contained"
                                 className="w-100"
                                 color="secondary"
+                                onClick={addToBag}
                             >
                                 add to bag
                             </Button>
@@ -77,7 +147,12 @@ const Product = () => {
                     </Grid>
                 </Grid>
             </Container>
-            <AddMoreCheckoutModal />
+            <AddMoreCheckoutModal
+                open={openModal}
+                handleClose={() => {
+                    setOpenModal(false);
+                }}
+            />
         </>
     );
 };

@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect, useContext } from "react";
+
+import { ProductsContext } from "../../contexts/products/ProductsContext";
 
 import NavBar from "../../NavBar";
 import SearchBar from "../../SearchBar";
@@ -7,6 +9,7 @@ import CategoryNav from "./CategoryNav";
 import { Container, Grid, Box, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
+import { useLocation, useHistory } from "react-router-dom";
 const useStyles = makeStyles(theme => ({
     clearPaddingOnSm: {
         [theme.breakpoints.down("sm")]: {
@@ -16,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     img: {
         width: "100%",
         height: "100%",
-        objectFit: "cover",
+        objectFit: "contain",
         filter: "brightness(75%)"
     },
     imgContainer: {
@@ -36,7 +39,25 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Menu = () => {
+    const productsContext = useContext(ProductsContext);
+    const location = useLocation();
+    const history = useHistory();
     const classes = useStyles();
+
+    const loadMenu = () => {
+        axios({
+            method: "GET",
+            url: `/api/menu${location.search}`
+        }).then(({ data }) => {
+            productsContext.dispatch({
+                type: "UPDATE_PRODUCTS",
+                payload: data
+            });
+        });
+    };
+    useEffect(() => {
+        loadMenu();
+    }, []);
     return (
         <>
             <NavBar withBasket />
@@ -44,129 +65,40 @@ const Menu = () => {
                 <SearchBar />
                 <CategoryNav />
                 <Grid container className="p-2">
-                    <Grid item xs={4} sm={3}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
-                                />
+                    {productsContext.data.products.map(product => (
+                        <Grid
+                            item
+                            xs={4}
+                            sm={3}
+                            key={product.id}
+                            onClick={() => {
+                                history.push(`/products/${product.id}`);
+                            }}
+                        >
+                            <Box className={classes.imgContainer}>
+                                <Box className={classes.imgSubContainer}>
+                                    <img
+                                        src={product.image}
+                                        className={classes.img}
+                                    />
+                                </Box>
                             </Box>
-                        </Box>
-                        <Box className="text-center">
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                Spicy fugkal chicken
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                ₱12
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    <Grid item xs={4} sm={3}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
-                                />
+                            <Box className="text-center">
+                                <Typography
+                                    variant="caption"
+                                    className="px-2 d-block"
+                                >
+                                    {product.name}
+                                </Typography>
+                                <Typography
+                                    variant="caption"
+                                    className="px-2 d-block"
+                                >
+                                    ₱ {product.price}
+                                </Typography>
                             </Box>
-                        </Box>
-                        <Box className="text-center">
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                Spicy fugkal chicken
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                ₱12
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    <Grid item xs={4} sm={3}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
-                                />
-                            </Box>
-                        </Box>
-                        <Box className="text-center">
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                Spicy fugkal chicken
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                ₱12
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    <Grid item xs={4} sm={3}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
-                                />
-                            </Box>
-                        </Box>
-                        <Box className="text-center">
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                Spicy fugkal chicken
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                ₱12
-                            </Typography>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={4} sm={3}>
-                        <Box className={classes.imgContainer}>
-                            <Box className={classes.imgSubContainer}>
-                                <img
-                                    src="/storage/home/category_images/all-products.jpg"
-                                    className={classes.img}
-                                />
-                            </Box>
-                        </Box>
-                        <Box className="text-center">
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                Spicy fugkal chicken
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                className="px-2 d-block"
-                            >
-                                ₱12
-                            </Typography>
-                        </Box>
-                    </Grid>
+                        </Grid>
+                    ))}
                 </Grid>
             </Container>
         </>

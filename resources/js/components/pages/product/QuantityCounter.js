@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import { QuantityContext } from "../../contexts/products/QuantityContext";
 
 import { Box, ButtonBase, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -22,8 +24,17 @@ const useStyles = makeStyles(theme => ({
         border: `2px solid ${theme.palette.primary.main}`
     }
 }));
+
 const QuantityCounter = () => {
+    const quantityContext = useContext(QuantityContext);
     const classes = useStyles();
+
+    const increment = () => {
+        quantityContext.dispatch({ type: "INCREMENT" });
+    };
+    const decrement = () => {
+        quantityContext.dispatch({ type: "DECREMENT" });
+    };
     return (
         <>
             <Box
@@ -31,16 +42,24 @@ const QuantityCounter = () => {
                 alignItems="center"
                 className={classes.container}
             >
-                <ButtonBase variant="contained" className={classes.button}>
+                <ButtonBase
+                    variant="contained"
+                    className={classes.button}
+                    onClick={decrement}
+                >
                     <RemoveIcon />
                 </ButtonBase>
                 <input
                     type="number"
                     className={classes.input}
                     disabled
-                    value={1}
+                    value={quantityContext.data.quantity}
                 />
-                <ButtonBase variant="contained" className={classes.button}>
+                <ButtonBase
+                    variant="contained"
+                    className={classes.button}
+                    onClick={increment}
+                >
                     <AddIcon />
                 </ButtonBase>
             </Box>

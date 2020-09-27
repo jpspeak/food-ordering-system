@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from "react";
 
 import { UserContext } from "./contexts/user/UserContext";
+import { OrderCountContext } from "./contexts/order_summary/OrderCountContext";
 
 import {
     AppBar,
@@ -35,7 +36,8 @@ const useStyles = makeStyles(theme => ({
         marginRight: theme.spacing(2)
     },
     title: {
-        flexGrow: 1
+        flexGrow: 1,
+        cursor: "pointer"
     },
     backButton: {
         flexGrow: 1
@@ -53,6 +55,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function NavBar({ useBackButton, withBasket }) {
     const userContext = useContext(UserContext);
+    const orderCountContext = useContext(OrderCountContext);
     const history = useHistory();
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const classes = useStyles();
@@ -159,21 +162,37 @@ export default function NavBar({ useBackButton, withBasket }) {
                                 <Typography
                                     variant="h6"
                                     className={classes.title}
+                                    onClick={() => {
+                                        history.push("/");
+                                    }}
                                 >
                                     Logo
                                 </Typography>
                             </>
                         )}
-                        {withBasket && (
-                            <IconButton
-                                edge="start"
-                                color="inherit"
-                                aria-label="menu"
-                            >
-                                <Badge badgeContent={8} color="secondary">
-                                    <ShoppingBasketIcon />
-                                </Badge>
-                            </IconButton>
+                        {userContext.data.user !== undefined && (
+                            <>
+                                {withBasket && (
+                                    <IconButton
+                                        edge="start"
+                                        color="inherit"
+                                        aria-label="menu"
+                                        onClick={() => {
+                                            history.push("/order-summary");
+                                        }}
+                                    >
+                                        <Badge
+                                            badgeContent={
+                                                orderCountContext.data
+                                                    .orderCount
+                                            }
+                                            color="secondary"
+                                        >
+                                            <ShoppingBasketIcon />
+                                        </Badge>
+                                    </IconButton>
+                                )}
+                            </>
                         )}
                     </Toolbar>
                 </Container>

@@ -19,8 +19,10 @@ const useStyles = makeStyles(theme => ({
         }
     }
 }));
+
 const OrderHistory = () => {
     const classes = useStyles();
+
     return (
         <>
             <NavBar useBackButton />

@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import { OrderSummaryContext } from "../../contexts/order_summary/OrderSummaryContext";
+import { OrderCountContext } from "../../contexts/order_summary/OrderCountContext";
 
 import { Typography, Paper, Box, ButtonBase } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -12,19 +15,69 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.primary.main
     }
 }));
-const OrderSummary = () => {
+const OrderSummary = ({ data }) => {
+    const orderSummaryContext = useContext(OrderSummaryContext);
+    const orderCountContext = useContext(OrderCountContext);
+    const increment = () => {
+        axios({
+            method: "POST",
+            url: `api/bag/${data.product_id}/increment`,
+            data: {
+                code: orderSummaryContext.data.orderSummary.coupon || ""
+            },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`
+            }
+        })
+            .then(({ data }) => {
+                orderSummaryContext.dispatch({
+                    type: "UPDATE_ORDER_SUMMARY",
+                    payload: data
+                });
+            })
+            .catch(err => {});
+    };
+    const decrement = () => {
+        axios({
+            method: "POST",
+            url: `api/bag/${data.product_id}/decrement`,
+            data: {
+                code: orderSummaryContext.data.orderSummary.coupon || ""
+            },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`
+            }
+        })
+            .then(({ data }) => {
+                orderSummaryContext.dispatch({
+                    type: "UPDATE_ORDER_SUMMARY",
+                    payload: data
+                });
+
+                orderCountContext.dispatch({
+                    type: "LOAD_ORDER_COUNT",
+                    payload: data.orderList.length
+                });
+            })
+            .catch(err => {});
+    };
+
     const classes = useStyles();
     return (
         <>
             <Paper square className="p-2 m-2">
                 <Box display="flex">
                     <img
-                        src="/storage/home/category_images/all-products.jpg"
-                        style={{ height: 100, width: 100, objectFit: "cover" }}
+                        src={data.product.image}
+                        style={{
+                            height: 100,
+                            width: 100,
+                            objectFit: "contain"
+                        }}
                     />
                     <Box flexGrow={1}>
                         <Typography className="px-2">
-                            Strawberry madafaking shake
+                            {data.product.name}
                         </Typography>
                     </Box>
 
@@ -39,20 +92,26 @@ const OrderSummary = () => {
                                 flexGrow={1}
                                 alignItems="center"
                             >
-                                <ButtonBase className={classes.quantityButton}>
+                                <ButtonBase
+                                    className={classes.quantityButton}
+                                    onClick={decrement}
+                                >
                                     <RemoveIcon />
                                 </ButtonBase>
                                 <Typography variant="caption" className="px-2">
-                                    1
+                                    {data.quantity}
                                 </Typography>
-                                <ButtonBase className={classes.quantityButton}>
+                                <ButtonBase
+                                    className={classes.quantityButton}
+                                    onClick={increment}
+                                >
                                     <AddIcon />
                                 </ButtonBase>
                             </Box>
                         </Box>
                         <Box>
                             <Typography className="font-weight-bold text-right">
-                                ₱ 190
+                                ₱ {data.total}
                             </Typography>
                         </Box>
                     </Box>

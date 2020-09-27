@@ -6,7 +6,7 @@ import { Paper, Box, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import LockIcon from "@material-ui/icons/Lock";
 
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 const useStyles = makeStyles(theme => ({
     mainContainer: {
         width: "100%",
@@ -24,6 +24,7 @@ const useStyles = makeStyles(theme => ({
 const Login = () => {
     const userContext = useContext(UserContext);
     const history = useHistory();
+    const location = useLocation();
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -35,6 +36,14 @@ const Login = () => {
         setFormData(prevState => {
             return { ...prevState, [name]: value };
         });
+    };
+    const redirect = () => {
+        console.log(location.state);
+        if (location.state) {
+            history.replace(location.state.returnPath);
+        } else {
+            history.replace("/");
+        }
     };
     const login = e => {
         e.preventDefault();
@@ -59,7 +68,7 @@ const Login = () => {
                             type: "UPDATE_USER",
                             payload: data
                         });
-                        history.replace("/");
+                        redirect();
                     })
                     .catch(err => {});
             })

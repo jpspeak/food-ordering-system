@@ -11,6 +11,7 @@ import {
     Modal
 } from "@material-ui/core";
 import ShoppingBasketIcon from "@material-ui/icons/ShoppingBasket";
+import { useHistory } from "react-router-dom";
 const styles = {
     container: {
         position: "absolute",
@@ -28,10 +29,11 @@ const styles = {
         fontSize: 72
     }
 };
-const AddMoreCheckoutModal = ({ open }) => {
+const AddMoreCheckoutModal = ({ open, handleClose }) => {
+    const history = useHistory();
     return (
         <>
-            <Modal open={true}>
+            <Modal open={open} onClose={handleClose}>
                 <Paper className="p-4" style={styles.container}>
                     <Box
                         display="flex"
@@ -49,6 +51,9 @@ const AddMoreCheckoutModal = ({ open }) => {
                             size="large"
                             color="secondary"
                             className="w-100 mb-3"
+                            onClick={() => {
+                                history.goBack();
+                            }}
                         >
                             add more products
                         </Button>
@@ -57,6 +62,9 @@ const AddMoreCheckoutModal = ({ open }) => {
                             size="large"
                             color="primary"
                             className="w-100"
+                            onClick={() => {
+                                history.push("/order-summary");
+                            }}
                         >
                             proceed to checkout
                         </Button>

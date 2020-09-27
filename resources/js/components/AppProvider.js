@@ -2,6 +2,7 @@ import React from "react";
 
 import App from "./App";
 import { UserProvider } from "./contexts/user/UserContext";
+import { OrderCountProvider } from "./contexts/order_summary/OrderCountContext";
 
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { red, amber } from "@material-ui/core/colors";
@@ -21,7 +22,9 @@ const AppProvider = () => {
         <>
             <UserProvider>
                 <ThemeProvider theme={theme}>
-                    <App />
+                    <OrderCountProvider>
+                        <App />
+                    </OrderCountProvider>
                 </ThemeProvider>
             </UserProvider>
         </>

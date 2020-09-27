@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
@@ -18,70 +18,75 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function OrderHistoryList() {
+    const [orderHistory, setOrderHistory] = useState([]);
     const classes = useStyles();
+
+    const loadOrderHistory = () => {
+        axios({
+            method: "GET",
+            url: "/api/order-history",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("userToken")}`
+            }
+        }).then(({ data }) => {
+            // console.log(data);
+            setOrderHistory(data);
+        });
+    };
+    useEffect(() => {
+        loadOrderHistory();
+    }, []);
 
     return (
         <div className={classes.root}>
-            <Accordion>
-                <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                >
-                    <Typography className={classes.heading}>
-                        Sep 20, 2020 5pm
-                    </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <Box className="w-100">
-                        <Box display="flex">
-                            <Box flexGrow={1}>
-                                <Typography variant="h6">
-                                    Order No.: 45Xlst
+            {orderHistory.map(item => (
+                <Accordion key={item.id}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                    >
+                        <Typography className={classes.heading}>
+                            {item.created_at}
+                        </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Box className="w-100">
+                            <Box display="flex">
+                                <Box flexGrow={1}>
+                                    <Typography variant="h6">
+                                        Order No.: {item.order_number}
+                                    </Typography>
+                                </Box>
+
+                                <Typography className="text-right ">
+                                    QTY
                                 </Typography>
                             </Box>
 
-                            <Typography className="text-right ">QTY</Typography>
+                            {item.order_items.map(product => (
+                                <>
+                                    <Divider />
+                                    <Box
+                                        display="flex"
+                                        className="py-2"
+                                        key={product.id}
+                                    >
+                                        <Box flexGrow={1}>
+                                            <Typography color="primary">
+                                                {product.product.name}
+                                            </Typography>
+                                        </Box>
+                                        <Typography color="primary">
+                                            {product.quantity}
+                                        </Typography>
+                                    </Box>
+                                </>
+                            ))}
                         </Box>
-                        <Divider />
-                        <Box display="flex" className="py-2">
-                            <Box flexGrow={1}>
-                                <Typography color="primary">
-                                    Strawberry madafaking shake
-                                </Typography>
-                            </Box>
-                            <Typography color="primary">3</Typography>
-                        </Box>
-                        <Divider />
-                        <Box display="flex" className="py-2">
-                            <Box flexGrow={1}>
-                                <Typography color="primary">
-                                    Strawberry madafaking shake
-                                </Typography>
-                            </Box>
-                            <Typography color="primary">3</Typography>
-                        </Box>
-                    </Box>
-                </AccordionDetails>
-            </Accordion>
-            <Accordion>
-                <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel2a-content"
-                    id="panel2a-header"
-                >
-                    <Typography className={classes.heading}>
-                        Accordion 2
-                    </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <Typography>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Suspendisse malesuada lacus ex, sit amet blandit leo
-                        lobortis eget.
-                    </Typography>
-                </AccordionDetails>
-            </Accordion>
+                    </AccordionDetails>
+                </Accordion>
+            ))}
         </div>
     );
 }
