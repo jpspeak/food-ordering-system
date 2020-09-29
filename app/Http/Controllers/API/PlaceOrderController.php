@@ -7,48 +7,52 @@ use App\Order;
 use App\OrderItem;
 use App\Bag;
 use App\Coupon;
+use App\Repositories\BagRepository;
+use App\Repositories\CouponRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PlaceOrderController extends Controller
 {
-    public function __construct()
+    public $couponRepository;
+    public $bagRepository;
+
+    public function __construct(CouponRepository $couponRepository, BagRepository $bagRepository)
     {
         $this->middleware('auth:api');
+        $this->couponRepository = $couponRepository;
+        $this->bagRepository = $bagRepository;
     }
     public function store()
     {
-        $coupon = Coupon::where(DB::raw("BINARY `code`"), request()->code)->first();
-        $orderList = Bag::where('user_id', auth()->user()->id)->with('product')->get();
 
+        $coupon = $this->couponRepository->checkCoupon(request()->code);
+
+        $bag = $this->bagRepository->show();
+        $subtotal = $this->bagRepository->subtotal();
         $couponCode = "";
         $percentageOff = 0;
-        $total = $orderList->sum('total');
         if ($coupon) {
+
             $couponCode = $coupon->code;
-            $percentageOff = $coupon->off;
+            $percentageOff = $coupon->percentage_off;
         }
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'order_number' => substr(md5(mt_rand()), 0, 7),
             'coupon' => $couponCode,
             'percentage_off' => $percentageOff,
-            'subtotal' => $orderList->sum('total'),
-            'total' => $total - $total * $percentageOff,
+            'subtotal' => $subtotal,
+            'total' => $subtotal - ($subtotal * $percentageOff),
         ]);
-        foreach ($orderList as $orderItem) {
+        foreach ($bag as $bagItem) {
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $orderItem->product->id,
-                'quantity' => $orderItem->quantity
+                'product_id' => $bagItem->product->id,
+                'quantity' => $bagItem->quantity
             ]);
         }
 
-        $this->clear_bag();
-    }
-
-    public function clear_bag()
-    {
-        Bag::where('user_id', auth()->user()->id)->delete();
+        $this->bagRepository->clearBag();
     }
 }

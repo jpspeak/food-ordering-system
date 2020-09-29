@@ -49,6 +49,7 @@ const OrderSummary = ({ data }) => {
             }
         })
             .then(({ data }) => {
+                console.log(data);
                 orderSummaryContext.dispatch({
                     type: "UPDATE_ORDER_SUMMARY",
                     payload: data
@@ -56,7 +57,7 @@ const OrderSummary = ({ data }) => {
 
                 orderCountContext.dispatch({
                     type: "LOAD_ORDER_COUNT",
-                    payload: data.orderList.length
+                    payload: data.bag.length
                 });
             })
             .catch(err => {});

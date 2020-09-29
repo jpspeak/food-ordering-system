@@ -36,7 +36,7 @@ Route::group(['middleware' => 'api'], function () {
     Route::post('bag/{id}/decrement', 'API\BagController@decrement');
     Route::get('bag/count', 'API\BagController@count');
 
-    Route::post('coupons/check', 'API\CouponController@check');
+    Route::post('apply-discount', 'API\CouponController@applyDiscount');
 
     Route::post('place-order', 'API\PlaceOrderController@store');
 

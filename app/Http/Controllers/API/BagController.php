@@ -7,90 +7,88 @@ use Illuminate\Http\Request;
 use App\Bag;
 use App\Coupon;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\BagRepository;
+use App\Repositories\CouponRepository;
+use App\Services\CouponService;
 
 class BagController extends Controller
 {
-    public function __construct()
+    public $couponRepository;
+    public $bagRepository;
+    public $couponService;
+    public function __construct(CouponRepository $couponRepository, BagRepository $bagRepository, CouponService $couponService)
     {
         $this->middleware('auth:api');
+        $this->couponRepository = $couponRepository;
+        $this->couponService = $couponService;
+        $this->bagRepository = $bagRepository;
     }
+
     public function store()
     {
-        $productExist = Bag::where('user_id', auth()->user()->id)
-            ->where('product_id', request()->product_id)->first();
-        if ($productExist) {
-            $productExist->update([
-                'quantity' => $productExist->quantity + request()->quantity
-            ]);
+        $bagItem = $this->bagRepository->showBagItem(request()->product_id);
+        if ($bagItem) {
+            $this->bagRepository->updateQuantity($bagItem, request()->quantity);
         } else {
-            Bag::create([
-                'user_id' => auth()->user()->id,
-                'product_id' => request()->product_id,
-                'quantity' => request()->quantity
-            ]);
+            $this->bagRepository->store(request()->product_id, request()->quantity);
         }
-        return $this->count();
+        return $this->bagRepository->count();
     }
-    public function count()
-    {
-        return count(Bag::where('user_id', auth()->user()->id)->get());
-    }
+
     public function increment($id)
     {
+        $bagItem = $this->bagRepository->showBagItem($id);
+        if ($bagItem) {
 
-        $productExist = Bag::where('user_id', auth()->user()->id)->where('product_id', $id)->first();
+            $this->bagRepository->incrementItem($id);
 
-        if ($productExist) {
-            $productExist->update([
-                'quantity' => $productExist->quantity + 1
+            $coupon = $this->couponRepository->checkCoupon(request()->code);
+            if ($coupon) {
+                $this->couponService->applyDiscount(request()->code);
+                return response()->json([
+                    'bag' => $this->couponService->bag,
+                    'coupon' => $this->couponService->couponCode,
+                    'percentageOff' => $this->couponService->percentageOff * 100 . '%',
+                    'subtotal' => $this->couponService->subtotal,
+                    'total' => $this->couponService->total
+
+                ]);
+            }
+
+            return response()->json([
+                'bag' => $this->bagRepository->show(),
+                'subtotal' => $this->bagRepository->subtotal(),
+                'total' => $this->bagRepository->subtotal(),
             ]);
-            $coupon = Coupon::where(DB::raw("BINARY `code`"), request()->code)->first();
-
-            return  $this->checkCoupon($coupon);
         }
     }
     public function decrement($id)
     {
+        $bagItem = $this->bagRepository->showBagItem($id);
+        if ($bagItem) {
 
-        $productExist = Bag::where('user_id', auth()->user()->id)->where('product_id', $id)->first();
-
-        if ($productExist) {
-            $newQuantity = $productExist->quantity - 1;
-            if ($newQuantity == 0) {
-                $productExist->delete();
+            if ($bagItem->quantity == 1) {
+                $bagItem->delete();
             } else {
-                $productExist->update([
-                    'quantity' => $newQuantity
+                $this->bagRepository->decrementItem($id);
+            }
+            $coupon = $this->couponRepository->checkCoupon(request()->code);
+            if ($coupon) {
+                $this->couponService->applyDiscount(request()->code);
+                return response()->json([
+                    'bag' => $this->couponService->bag,
+                    'coupon' => $this->couponService->couponCode,
+                    'percentageOff' => $this->couponService->percentageOff * 100 . '%',
+                    'subtotal' => $this->couponService->subtotal,
+                    'total' => $this->couponService->total
+
                 ]);
             }
-            $coupon = Coupon::where(DB::raw("BINARY `code`"), request()->code)->first();
-
-            return  $this->checkCoupon($coupon);
+            return response()->json([
+                'bag' => $this->bagRepository->show(),
+                'subtotal' => $this->bagRepository->subtotal(),
+                'total' => $this->bagRepository->subtotal(),
+            ]);
         }
-    }
-    public function checkCoupon($coupon)
-    {
-        if ($coupon) {
-
-            $orderList = Bag::where('user_id', auth()->user()->id)->with('product')->get();
-            $couponCode = $coupon->code;
-            $percentageOff = $coupon->percentage_off * 100;
-            $total = $orderList->sum('total');
-            return [
-                'orderList' => $orderList,
-                'coupon' => $couponCode,
-                'percentageOff' => $percentageOff,
-                'subtotal' => $total,
-                'total' => $total - $total * $coupon->percentage_off
-
-            ];
-        }
-
-        $orderList = Bag::where('user_id', auth()->user()->id)->with('product')->get();
-        return [
-            'orderList' => $orderList,
-            'subtotal' => $orderList->sum('total'),
-            'total' => $orderList->sum('total')
-        ];
     }
 }

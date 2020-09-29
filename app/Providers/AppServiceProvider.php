@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Bag;
+
+use App\Repositories\BagRepository;
+
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
@@ -15,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(BagRepository::class, function () {
+            return new BagRepository(new Bag());
+        });
     }
 
     /**

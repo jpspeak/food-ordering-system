@@ -48,11 +48,11 @@ const OrderSummary = () => {
             });
         });
     };
-    const checkCoupon = e => {
+    const applyDiscount = e => {
         const code = e.target.value;
         axios({
             method: "POST",
-            url: `/api/coupons/check`,
+            url: `/api/apply-discount`,
             data: {
                 code: code
             },
@@ -74,11 +74,12 @@ const OrderSummary = () => {
     };
     const placeOrder = () => {
         const orderSummary = orderSummaryContext.data.orderSummary;
+        console.log(orderSummary);
         axios({
             method: "POST",
             url: `/api/place-order`,
             data: {
-                coupon: orderSummary.coupon
+                code: orderSummary.coupon
             },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("userToken")}`
@@ -104,9 +105,9 @@ const OrderSummary = () => {
                     Order Summary
                 </Typography>
                 {orderSummaryContext.data.orderSummary &&
-                    orderSummaryContext.data.orderSummary.orderList.map(
-                        item => <OrderItem key={item.id} data={item} />
-                    )}
+                    orderSummaryContext.data.orderSummary.bag.map(item => (
+                        <OrderItem key={item.id} data={item} />
+                    ))}
 
                 <Paper square className="p-2 m-2">
                     <input
@@ -114,7 +115,7 @@ const OrderSummary = () => {
                         placeholder="Enter Coupon Code"
                         className={` p-2 my-2`}
                         disabled={invalidCoupon == false}
-                        onChange={checkCoupon}
+                        onChange={applyDiscount}
                     />
                     {invalidCoupon == undefined ? (
                         ""
@@ -149,7 +150,7 @@ const OrderSummary = () => {
                             <Box display="flex" className="py-2">
                                 <Box flexGrow={1}>
                                     <Typography>
-                                        {`${orderSummaryContext.data.orderSummary.coupon} (${orderSummaryContext.data.orderSummary.percentageOff}% off)`}
+                                        {`${orderSummaryContext.data.orderSummary.coupon} (${orderSummaryContext.data.orderSummary.percentageOff} off)`}
                                     </Typography>
                                 </Box>
                             </Box>
